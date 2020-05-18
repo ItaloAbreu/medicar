@@ -78,12 +78,30 @@ WSGI_APPLICATION = 'medicar.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+
+try:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ['POSTGRES_DB'],
+            'USER': os.environ['POSTGRESQL_USER'],
+            'PASSWORD': os.environ['POSTGRESQL_PASSWORD'],
+            'HOST': os.environ['POSTGRESQL_HOST'],
+            'PORT': os.environ['POSTGRESQL_PORT']
+        }
     }
-}
+except :
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'medicar_db',
+            'USER': 'postgres',
+            'PASSWORD': '12345678',
+            'HOST': 'localhost',
+            'PORT': '5432'
+        }
+    }
+
 
 
 # Password validation
@@ -123,7 +141,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend']
 }
+
+# ie if Heroku server
+if 'DATABASE_URL' in os.environ:
+    import dj_database_url
+    DATABASES = {'default': dj_database_url.config()}
