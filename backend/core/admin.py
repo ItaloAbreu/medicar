@@ -1,3 +1,7 @@
 from django.contrib import admin
+from core.models import Especialidade
 
-# Register your models here.
+class EspecialidadeAdmin(admin.ModelAdmin):
+    list_display = ['nome']
+
+admin.site.register(Especialidade, EspecialidadeAdmin)
